@@ -175,9 +175,6 @@
     </footer>
 
     <script>
-        // =========================================================================
-        // PERBAIKAN: Alamat API langsung dikunci menuju Link Server Render Anda
-        // =========================================================================
         const BACKEND_KASIR_API = "https://kopral-coffee-central.onrender.com/api/pesanan-masuk";
 
         const menuDatabase = {
@@ -238,7 +235,7 @@
             if (existingItem) {
                 existingItem.quantity += 1;
             } else {
-                cart.push({ name, price, quantity: 1 });
+                cart.push({ name, price, quantity: 1, note: "" });
             }
             updateCartUI();
         }
@@ -263,22 +260,32 @@
                 total += item.price * item.quantity;
                 totalItems += item.quantity;
                 cartItemsContainer.innerHTML += `
-                    <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border">
-                        <div>
-                            <h4 class="font-bold text-sm text-[#1e140a]">${item.name}</h4>
-                            <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}</p>
+                    <div class="bg-gray-50 p-3 rounded-xl border space-y-2">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h4 class="font-bold text-sm text-[#1e140a]">${item.name}</h4>
+                                <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="changeQuantity(${index}, -1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold hover:bg-gray-300">-</button>
+                                <span class="text-sm font-bold">${item.quantity}</span>
+                                <button onclick="changeQuantity(${index}, 1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold hover:bg-gray-300">+</button>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="changeQuantity(${index}, -1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold hover:bg-gray-300">-</button>
-                            <span class="text-sm font-bold">${item.quantity}</span>
-                            <button onclick="changeQuantity(${index}, 1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold hover:bg-gray-300">+</button>
-                        </div>
+                        <input type="text" placeholder="Catatan (misal: kurang gula)" 
+                               value="${item.note || ''}" 
+                               onchange="updateNote(${index}, this.value)"
+                               class="w-full text-[10px] p-2 rounded border border-gray-200 focus:ring-1 focus:ring-amber-700 outline-none">
                     </div>`;
             });
 
             cartTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
             cartCount.innerText = totalItems;
             cartCount.classList.remove('hidden');
+        }
+
+        function updateNote(index, value) {
+            cart[index].note = value;
         }
 
         function changeQuantity(index, delta) {
