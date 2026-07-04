@@ -6,6 +6,8 @@
     <title>KOPRAL Coffee - Online Self Ordering System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Cloudinary Widget Script -->
+    <script src="https://widget.cloudinary.com/v2.0/global/all.js" type="text/javascript"></script>
     <style>
         html { scroll-behavior: smooth; }
         .modal-blur { backdrop-filter: blur(4px); transition: all 0.3s ease-in-out; }
@@ -173,16 +175,18 @@
                 <button id="btn-show-qris" onclick="toggleQrisModal()" class="w-full bg-[#2563eb] text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition hidden flex items-center justify-center gap-2">
                     <i class="fas fa-qrcode"></i> Tampilkan Barcode QRIS
                 </button>
+                
+                <!-- Container Bukti Baru (Cloudinary) -->
                 <div id="bukti-container" class="hidden space-y-3 pt-2">
                     <input type="text" id="sender-name" placeholder="Nama Pemilik Rekening Pengirim" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
-                    <div class="flex items-center gap-4">
-                        <label class="bg-orange-100 text-orange-800 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer hover:bg-orange-200 transition">
-                            Choose File <input type="file" id="bukti-file" accept="image/*" class="hidden">
-                        </label>
-                        <span id="file-name-display" class="text-xs text-gray-500">No file chosen</span>
-                    </div>
+                    <button type="button" onclick="bukaWidgetUpload()" class="w-full bg-orange-100 text-orange-800 py-3 rounded-lg text-sm font-bold border border-dashed border-orange-400 hover:bg-orange-200 transition">
+                        <i class="fas fa-camera mr-2"></i> Upload Bukti Transfer
+                    </button>
+                    <p id="file-name-display" class="text-xs text-center text-gray-500 font-bold">Belum ada bukti diunggah</p>
+                    <input type="hidden" id="hidden-url-bukti">
                 </div>
-                <button onclick="kirimKeKasir()" class="w-full bg-[#059669] text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition">
+
+                <button id="btn-kirim" onclick="kirimKeKasir()" class="w-full bg-[#059669] text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition">
                     Kirim ke Kasir
                 </button>
             </div>
@@ -195,30 +199,27 @@
 
     <script>
         const BACKEND_KASIR_API = "https://kopral-coffee-central.onrender.com/api/pesanan-masuk";
-        
-        const menuDatabase = {
-            "coffee": [
-                { name: "Espresso Roman", price: 22000, desc: "Ekstrak kopi pekat murni.", img: "", fallback: "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=500" },
-                { name: "Creamy Latte", price: 28000, desc: "Espresso lembut dengan susu segar foam.", img: "", fallback: "https://images.unsplash.com/photo-1570968915860-54d5c301fc9f?q=80&w=500" },
-                { name: "Kopi Gula Aren", price: 25000, desc: "Kopi susu dengan manisnya aren asli.", img: "", fallback: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?q=80&w=500" }
-            ],
-            "non-coffee": [
-                { name: "Pure Matcha Latte", price: 27000, desc: "Matcha jepang asli dipadu susu segar.", img: "", fallback: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?q=80&w=500" },
-                { name: "Signature Chocolate", price: 26000, desc: "Cokelat pekat premium manis gurih.", img: "", fallback: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=500" }
-            ],
-            "snacks": [
-                { name: "Butter Croissant", price: 22000, desc: "Pastry renyah berlapis khas Prancis.", img: "", fallback: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=500" },
-                { name: "French Fries", price: 18000, desc: "Kentang goreng renyah bumbu gurih.", img: "", fallback: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?q=80&w=500" }
-            ]
-        };
-
         let cart = JSON.parse(localStorage.getItem('kopral_cart')) || [];
+        let buktiUrlCloudinary = ""; 
+
+        // KONFIGURASI CLOUDINARY WIDGET
+        function bukaWidgetUpload() {
+            var myWidget = cloudinary.createUploadWidget({
+                cloudName: 'wiosnp5g', // GANTI INI
+                uploadPreset: 'kopral_preset', // GANTI INI
+                sources: ['local', 'camera'],
+                multiple: false
+            }, (error, result) => { 
+                if (!error && result && result.event === "success") { 
+                    buktiUrlCloudinary = result.info.secure_url;
+                    document.getElementById('file-name-display').innerText = "✅ Bukti Transfer Terupload!";
+                    document.getElementById('file-name-display').classList.add('text-green-600');
+                }
+            });
+            myWidget.open();
+        }
         
         window.onload = () => { updateCartUI(); const id = localStorage.getItem('active_order_id'); if(id) renderStatusPesanan(id); };
-
-        document.getElementById('bukti-file').addEventListener('change', function() {
-            document.getElementById('file-name-display').innerText = this.files[0] ? this.files[0].name : "No file chosen";
-        });
 
         function toggleBuktiField() {
             const method = document.getElementById('payment-method').value;
@@ -244,13 +245,8 @@
         }
 
         function toggleQrisModal() { document.getElementById('qris-modal').classList.toggle('hidden'); }
-
-        async function getBase64(file) {
-            return new Promise((res, rej) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => res(reader.result); reader.onerror = err => rej(err); });
-        }
-
         function saveToStorage() { localStorage.setItem('kopral_cart', JSON.stringify(cart)); }
-
+        
         function renderStatusPesanan(orderId) {
             const container = document.getElementById('cart-items');
             const footer = document.getElementById('cart-footer');
@@ -273,18 +269,31 @@
         function closeMenuModal() { document.getElementById('menu-modal').classList.add('hidden'); }
         function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
 
+        const menuDatabase = {
+            "coffee": [
+                { name: "Espresso Roman", price: 22000, desc: "Ekstrak kopi pekat murni.", img: "", fallback: "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=500" },
+                { name: "Creamy Latte", price: 28000, desc: "Espresso lembut dengan susu segar foam.", img: "", fallback: "https://images.unsplash.com/photo-1570968915860-54d5c301fc9f?q=80&w=500" },
+                { name: "Kopi Gula Aren", price: 25000, desc: "Kopi susu dengan manisnya aren asli.", img: "", fallback: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?q=80&w=500" }
+            ],
+            "non-coffee": [
+                { name: "Pure Matcha Latte", price: 27000, desc: "Matcha jepang asli dipadu susu segar.", img: "", fallback: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?q=80&w=500" },
+                { name: "Signature Chocolate", price: 26000, desc: "Cokelat pekat premium manis gurih.", img: "", fallback: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=500" }
+            ],
+            "snacks": [
+                { name: "Butter Croissant", price: 22000, desc: "Pastry renyah berlapis khas Prancis.", img: "", fallback: "https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=500" },
+                { name: "French Fries", price: 18000, desc: "Kentang goreng renyah bumbu gurih.", img: "", fallback: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?q=80&w=500" }
+            ]
+        };
+
         function addToCart(name, price) {
             const existing = cart.find(item => item.name === name);
             if (existing) existing.quantity += 1; else cart.push({ name, price, quantity: 1, note: "" });
             updateCartUI();
         }
 
-        // Fungsi baru untuk mengubah kuantitas
         function changeQuantity(index, delta) {
             cart[index].quantity += delta;
-            if (cart[index].quantity <= 0) {
-                cart.splice(index, 1);
-            }
+            if (cart[index].quantity <= 0) cart.splice(index, 1);
             updateCartUI();
         }
 
@@ -293,37 +302,12 @@
             const totalEl = document.getElementById('cart-total');
             const countEl = document.getElementById('cart-count');
             saveToStorage();
-            
-            if (cart.length === 0) { 
-                container.innerHTML = '<p class="text-gray-500 text-center py-8">Keranjang kosong.</p>'; 
-                totalEl.innerText = 'Rp 0'; 
-                countEl.classList.add('hidden'); 
-                return; 
-            }
-            
-            let total = 0, totalItems = 0; 
-            container.innerHTML = '';
-            
+            if (cart.length === 0) { container.innerHTML = '<p class="text-gray-500 text-center py-8">Keranjang kosong.</p>'; totalEl.innerText = 'Rp 0'; countEl.classList.add('hidden'); return; }
+            let total = 0, totalItems = 0; container.innerHTML = '';
             cart.forEach((item, index) => {
-                total += item.price * item.quantity; 
-                totalItems += item.quantity;
-                container.innerHTML += `
-                    <div class="bg-gray-50 p-3 rounded-xl">
-                        <div class="flex justify-between items-center mb-2">
-                            <div>
-                                <h4 class="font-bold text-sm">${item.name}</h4>
-                                <p class="text-[10px] text-gray-500">@ Rp ${item.price.toLocaleString('id-ID')}</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <button onclick="changeQuantity(${index}, -1)" class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center font-bold">-</button>
-                                <span class="font-bold text-sm w-4 text-center">${item.quantity}</span>
-                                <button onclick="changeQuantity(${index}, 1)" class="w-6 h-6 bg-[#e6c694] rounded-full flex items-center justify-center font-bold">+</button>
-                            </div>
-                        </div>
-                        <input type="text" placeholder="Catatan" value="${item.note || ''}" onchange="updateNote(${index}, this.value)" class="w-full text-[10px] p-1.5 rounded border outline-none">
-                    </div>`;
+                total += item.price * item.quantity; totalItems += item.quantity;
+                container.innerHTML += `<div class="bg-gray-50 p-3 rounded-xl"><div class="flex justify-between items-center mb-2"><div><h4 class="font-bold text-sm">${item.name}</h4><p class="text-[10px] text-gray-500">@ Rp ${item.price.toLocaleString('id-ID')}</p></div><div class="flex items-center gap-3"><button onclick="changeQuantity(${index}, -1)" class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center font-bold">-</button><span class="font-bold text-sm w-4 text-center">${item.quantity}</span><button onclick="changeQuantity(${index}, 1)" class="w-6 h-6 bg-[#e6c694] rounded-full flex items-center justify-center font-bold">+</button></div></div><input type="text" placeholder="Catatan" value="${item.note || ''}" onchange="updateNote(${index}, this.value)" class="w-full text-[10px] p-1.5 rounded border outline-none"></div>`;
             });
-            
             totalEl.innerText = 'Rp ' + total.toLocaleString('id-ID');
             countEl.innerText = totalItems;
             countEl.classList.remove('hidden');
@@ -332,27 +316,37 @@
         function updateNote(index, value) { cart[index].note = value; saveToStorage(); }
 
         async function kirimKeKasir() {
+            const btn = document.getElementById('btn-kirim');
             const nama = document.getElementById('cust-name').value.trim();
             const meja = document.getElementById('cust-table').value.trim();
-            const metode = document.getElementById('payment-method').value;
+            const metodePembayaran = document.getElementById('payment-method').value;
             const tujuan = document.getElementById('payment-destination').value;
             const pengirim = document.getElementById('sender-name').value.trim();
-            const fileInput = document.getElementById('bukti-file');
             
-            let buktiBase64 = "";
-            if (metode === 'Transfer') {
-                if (!tujuan || !pengirim || !fileInput.files[0]) { alert('Lengkapi data pembayaran (Tujuan, Nama Pengirim, dan Bukti)!'); return; }
-                buktiBase64 = await getBase64(fileInput.files[0]);
-            }
-            if (!nama || !meja || cart.length === 0) { alert('Lengkapi Nama, Meja, dan Pesanan!'); return; }
+            if (!nama || !meja || cart.length === 0) { alert('Mohon lengkapi Nama, Nomor Meja, dan pilih menu!'); return; }
+            if (metodePembayaran === 'Transfer' && (!tujuan || !pengirim || !buktiUrlCloudinary)) { alert('Lengkapi data pembayaran (Tujuan, Nama Pengirim, dan Upload Bukti Transfer)!'); return; }
             
-            const orderId = "KPRL-" + Date.now();
-            const payload = { id_pesanan: orderId, nama, meja, metode: document.getElementById('order-method').value, pembayaran: metode, tujuan_pembayaran: tujuan, nama_pengirim: pengirim, bukti_transfer: buktiBase64, items: cart, total: cart.reduce((s, i) => s + (i.price * i.quantity), 0), status_pesanan: "Menunggu", waktu_pesan: new Date().toISOString() };
+            btn.disabled = true; btn.innerText = "Mengirim...";
+            
+            const payload = { 
+                id_pesanan: "KPRL-" + Date.now(), 
+                nama, meja, 
+                metode: document.getElementById('order-method').value, 
+                pembayaran: metodePembayaran, 
+                tujuan_pembayaran: tujuan, 
+                nama_pengirim: pengirim, 
+                bukti_transfer: buktiUrlCloudinary, 
+                items: cart, 
+                total: cart.reduce((s, i) => s + (i.price * i.quantity), 0), 
+                status_pesanan: "Menunggu", 
+                waktu_pesan: new Date().toISOString() 
+            };
 
             try {
                 const response = await fetch(BACKEND_KASIR_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (response.ok) { localStorage.setItem('active_order_id', orderId); cart = []; localStorage.removeItem('kopral_cart'); renderStatusPesanan(orderId); } else { alert('Gagal mengirim.'); }
-            } catch (error) { alert('Cek koneksi internet.'); }
+                if (response.ok) { localStorage.setItem('active_order_id', payload.id_pesanan); cart = []; localStorage.removeItem('kopral_cart'); renderStatusPesanan(payload.id_pesanan); }
+                else throw new Error();
+            } catch (e) { alert('Gagal mengirim pesanan. Cek koneksi.'); btn.disabled = false; btn.innerText = "Kirim ke Kasir"; }
         }
     </script>
 </body>
