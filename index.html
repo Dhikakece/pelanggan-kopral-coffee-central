@@ -13,6 +13,16 @@
 </head>
 <body class="bg-[#faf7f2] text-[#332211] font-sans antialiased">
 
+    <!-- Modal QRIS -->
+    <div id="qris-modal" class="fixed inset-0 bg-black/80 z-[80] hidden flex items-center justify-center p-4 modal-blur">
+        <div class="bg-white p-6 rounded-3xl max-w-sm w-full text-center">
+            <h3 class="font-bold text-lg mb-4">Scan QRIS KOPRAL Coffee</h3>
+            <img src="assets/qris-code.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5064/5064943.png'" alt="QRIS Code" class="w-full h-auto mb-4 border rounded-lg">
+            <p class="text-xs text-gray-500 mb-6">Pastikan saldo Anda cukup sebelum melakukan scan.</p>
+            <button onclick="toggleQrisModal()" class="w-full bg-[#1e140a] text-white py-3 rounded-xl font-bold">Tutup</button>
+        </div>
+    </div>
+
     <nav class="fixed w-full bg-[#1e140a]/95 text-white backdrop-blur-sm z-50 shadow-lg">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" class="flex items-center gap-3 group">
@@ -55,7 +65,7 @@
                     </div>
                 </div>
                 <div class="p-4 text-center">
-                    <p class="text-sm text-gray-500 font-medium">Espresso, Latte, Aren, & Macchiato</p>
+                    <p class="text-sm text-gray-500 font-medium">Espresso, Latte, & Aren</p>
                     <span class="mt-2 inline-block text-amber-800 text-xs font-bold">Buka Menu <i class="fas fa-arrow-right ml-1"></i></span>
                 </div>
             </div>
@@ -67,7 +77,7 @@
                     </div>
                 </div>
                 <div class="p-4 text-center">
-                    <p class="text-sm text-gray-500 font-medium">Matcha, Chocolate, Artisan Tea, & Juice</p>
+                    <p class="text-sm text-gray-500 font-medium">Matcha & Chocolate</p>
                     <span class="mt-2 inline-block text-amber-800 text-xs font-bold">Buka Menu <i class="fas fa-arrow-right ml-1"></i></span>
                 </div>
             </div>
@@ -79,13 +89,37 @@
                     </div>
                 </div>
                 <div class="p-4 text-center">
-                    <p class="text-sm text-gray-500 font-medium">Croissant, French Fries, Toast, & Platter</p>
+                    <p class="text-sm text-gray-500 font-medium">Croissant & French Fries</p>
                     <span class="mt-2 inline-block text-amber-800 text-xs font-bold">Buka Menu <i class="fas fa-arrow-right ml-1"></i></span>
                 </div>
             </div>
         </div>
     </section>
 
+    <section id="cara-pesan" class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-bold text-[#1e140a] mb-12">Cara Pesan</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 bg-[#e6c694] text-[#1e140a] rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">1</div>
+                    <h4 class="font-bold">Pilih Menu</h4>
+                    <p class="text-sm text-gray-500">Pilih kategori dan tambahkan menu favorit ke keranjang Anda.</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="w-12 h-12 bg-[#e6c694] text-[#1e140a] rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">2</div>
+                    <h4 class="font-bold">Isi Data Pesanan</h4>
+                    <p class="text-sm text-gray-500">Masukkan nama dan nomor meja, serta pilih metode pembayaran.</p>
+                </div>
+                <div class="space-y-3">
+                    <div class="w-12 h-12 bg-[#e6c694] text-[#1e140a] rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">3</div>
+                    <h4 class="font-bold">Tunggu Pesanan</h4>
+                    <p class="text-sm text-gray-500">Kirim pesanan dan tunggu pesanan Anda sampai di meja.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
     <div id="menu-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 modal-blur">
         <div class="bg-white w-full max-w-4xl h-[85vh] rounded-3xl overflow-hidden shadow-2xl flex flex-col relative">
             <div class="p-6 bg-[#1e140a] text-white flex justify-between items-center">
@@ -104,65 +138,54 @@
         </div>
     </div>
 
-    <section id="cara-pesan" class="bg-[#1e140a] text-white py-16">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <h2 class="text-3xl font-bold text-[#e6c694] mb-8">3 Langkah Mudah Memesan</h2>
-            <div class="grid md:grid-cols-3 gap-8 text-center">
-                <div class="p-4">
-                    <div class="w-12 h-12 bg-[#e6c694] text-[#1e140a] rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-3">1</div>
-                    <h4 class="font-bold mb-1">Pilih Kategori</h4>
-                    <p class="text-sm text-gray-400">Buka pop-up kategori menu untuk melihat semua pilihan minuman/makanan.</p>
-                </div>
-                <div class="p-4">
-                    <div class="w-12 h-12 bg-[#e6c694] text-[#1e140a] rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-3">2</div>
-                    <h4 class="font-bold mb-1">Isi Data Meja</h4>
-                    <p class="text-sm text-gray-400">Buka keranjang, ketik nama Anda beserta nomor meja aktif Anda.</p>
-                </div>
-                <div class="p-4">
-                    <div class="w-12 h-12 bg-[#e6c694] text-[#1e140a] rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-3">3</div>
-                    <h4 class="font-bold mb-1">Kirim Ke Kasir</h4>
-                    <p class="text-sm text-gray-400">Klik kirim, pesanan otomatis ter-input masuk ke monitor kasir utama.</p>
-                </div>
+    <div id="cart-modal" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center p-4 modal-blur">
+        <div class="bg-white w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="p-6 bg-[#1e140a] text-white flex justify-between items-center">
+                <h3 class="text-xl font-bold"><i class="fas fa-shopping-bag mr-2"></i>Daftar Pesanan</h3>
+                <button onclick="toggleCart()" class="text-2xl hover:text-[#e6c694]">×</button>
             </div>
-        </div>
-    </section>
-
-    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-96 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
-        <div class="p-6 bg-[#1e140a] text-white flex justify-between items-center">
-            <h3 class="text-xl font-bold"><i class="fas fa-mug-hot mr-2"></i>Daftar Pesanan</h3>
-            <button onclick="toggleCart()" class="text-2xl hover:text-[#e6c694]">×</button>
-        </div>
-        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
-            <p class="text-gray-500 text-center py-8">Keranjang belanja kosong.</p>
-        </div>
-        <div id="cart-footer" class="p-6 border-t border-gray-100 bg-gray-50">
-            <div class="flex justify-between font-bold text-lg mb-4 text-[#1e140a]">
-                <span>Total Biaya:</span>
-                <span id="cart-total">Rp 0</span>
-            </div>
-            <div class="space-y-3 mb-4">
-                <input type="text" id="cust-name" placeholder="Nama Pelanggan" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
-                <input type="number" id="cust-table" placeholder="Nomor Meja Anda" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
-                <select id="order-method" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
+            <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4"></div>
+            <div id="cart-footer" class="p-6 border-t border-gray-100 bg-white space-y-3">
+                <div class="flex justify-between font-bold text-lg mb-2 text-[#332211]">
+                    <span>Total Biaya:</span>
+                    <span id="cart-total">Rp 0</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="cust-name" placeholder="Nama" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
+                    <input type="number" id="cust-table" placeholder="No. Meja" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
+                </div>
+                <select id="order-method" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-700">
                     <option value="Dine-In">Makan di tempat (Dine-In)</option>
                     <option value="Take-Away">Bawa Pulang (Take-Away)</option>
                 </select>
-                <select id="payment-method" onchange="toggleBuktiField()" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
+                <select id="payment-method" onchange="toggleBuktiField()" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-700">
                     <option value="Cash">Tunai (Cash)</option>
                     <option value="Transfer">Transfer / QRIS</option>
-                    <option value="Testing-Mode">Uji Coba (Test Mode)</option>
                 </select>
-                
-                <!-- Input Bukti Transfer Baru -->
-                <div id="bukti-container" class="hidden space-y-3 pt-2 border-t mt-2">
-                    <label class="text-[10px] font-bold text-gray-500 uppercase">Detail Pembayaran</label>
-                    <input type="text" id="sender-name" placeholder="Nama Pemilik Rekening Pengirim" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
-                    <input type="file" id="bukti-file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                <div id="destination-container" class="hidden">
+                    <select id="payment-destination" onchange="toggleBuktiField()" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-700">
+                        <option value="">-- Pilih Tujuan Pembayaran --</option>
+                        <option value="BCA">BCA: 1234567890 (Kopral Coffee)</option>
+                        <option value="Mandiri">Mandiri: 0987654321 (Kopral Coffee)</option>
+                        <option value="QRIS">QRIS: Scan di Kasir</option>
+                    </select>
                 </div>
+                <button id="btn-show-qris" onclick="toggleQrisModal()" class="w-full bg-[#2563eb] text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition hidden flex items-center justify-center gap-2">
+                    <i class="fas fa-qrcode"></i> Tampilkan Barcode QRIS
+                </button>
+                <div id="bukti-container" class="hidden space-y-3 pt-2">
+                    <input type="text" id="sender-name" placeholder="Nama Pemilik Rekening Pengirim" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
+                    <div class="flex items-center gap-4">
+                        <label class="bg-orange-100 text-orange-800 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer hover:bg-orange-200 transition">
+                            Choose File <input type="file" id="bukti-file" accept="image/*" class="hidden">
+                        </label>
+                        <span id="file-name-display" class="text-xs text-gray-500">No file chosen</span>
+                    </div>
+                </div>
+                <button onclick="kirimKeKasir()" class="w-full bg-[#059669] text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition">
+                    Kirim ke Kasir
+                </button>
             </div>
-            <button onclick="kirimKeKasir()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2">
-                <i class="fas fa-paper-plane"></i> Kirim Pesanan ke Kasir
-            </button>
         </div>
     </div>
 
@@ -172,6 +195,7 @@
 
     <script>
         const BACKEND_KASIR_API = "https://kopral-coffee-central.onrender.com/api/pesanan-masuk";
+        
         const menuDatabase = {
             "coffee": [
                 { name: "Espresso Roman", price: 22000, desc: "Ekstrak kopi pekat murni.", img: "", fallback: "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=500" },
@@ -190,195 +214,142 @@
 
         let cart = JSON.parse(localStorage.getItem('kopral_cart')) || [];
         
-        window.onload = function() {
-            updateCartUI();
-            const savedOrderId = localStorage.getItem('active_order_id');
-            if (savedOrderId) {
-                renderStatusPesanan(savedOrderId);
-            }
-        };
+        window.onload = () => { updateCartUI(); const id = localStorage.getItem('active_order_id'); if(id) renderStatusPesanan(id); };
+
+        document.getElementById('bukti-file').addEventListener('change', function() {
+            document.getElementById('file-name-display').innerText = this.files[0] ? this.files[0].name : "No file chosen";
+        });
 
         function toggleBuktiField() {
             const method = document.getElementById('payment-method').value;
-            const container = document.getElementById('bukti-container');
-            container.classList.toggle('hidden', method !== 'Transfer');
+            const dest = document.getElementById('payment-destination').value;
+            const buktiContainer = document.getElementById('bukti-container');
+            const destContainer = document.getElementById('destination-container');
+            const btnQris = document.getElementById('btn-show-qris');
+
+            if (method === 'Transfer') {
+                destContainer.classList.remove('hidden');
+                if (dest !== "") {
+                    buktiContainer.classList.remove('hidden');
+                    btnQris.classList.toggle('hidden', dest !== 'QRIS');
+                } else {
+                    buktiContainer.classList.add('hidden');
+                    btnQris.classList.add('hidden');
+                }
+            } else {
+                destContainer.classList.add('hidden');
+                buktiContainer.classList.add('hidden');
+                btnQris.classList.add('hidden');
+            }
         }
+
+        function toggleQrisModal() { document.getElementById('qris-modal').classList.toggle('hidden'); }
 
         async function getBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
+            return new Promise((res, rej) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => res(reader.result); reader.onerror = err => rej(err); });
         }
 
-        function saveToStorage() {
-            localStorage.setItem('kopral_cart', JSON.stringify(cart));
-            localStorage.setItem('kopral_name', document.getElementById('cust-name').value);
-            localStorage.setItem('kopral_table', document.getElementById('cust-table').value);
-        }
+        function saveToStorage() { localStorage.setItem('kopral_cart', JSON.stringify(cart)); }
 
         function renderStatusPesanan(orderId) {
             const container = document.getElementById('cart-items');
             const footer = document.getElementById('cart-footer');
-            
-            container.innerHTML = `
-                <div class="text-center py-10 space-y-4">
-                    <div class="text-emerald-600 text-5xl"><i class="fas fa-check-circle"></i></div>
-                    <h3 class="font-bold text-lg">Pesanan Aktif!</h3>
-                    <p class="text-sm text-gray-600">ID: ${orderId}</p>
-                    <p class="text-xs bg-amber-100 p-3 rounded-lg text-amber-900">Pesanan Anda sedang diproses oleh kasir. Mohon tetap di meja Anda.</p>
-                    <button onclick="bersihkanPesanan()" class="text-xs underline text-gray-500">Pesan Menu Lain</button>
-                </div>
-            `;
+            container.innerHTML = `<div class="text-center py-10"><div class="text-emerald-600 text-5xl mb-4"><i class="fas fa-check-circle"></i></div><h3 class="font-bold text-lg">Pesanan Aktif!</h3><p class="text-sm text-gray-600 mb-2">ID: ${orderId}</p><button onclick="bersihkanPesanan()" class="text-xs underline text-gray-500">Pesan Lagi</button></div>`;
             footer.classList.add('hidden');
         }
 
-        function bersihkanPesanan() {
-            localStorage.removeItem('active_order_id');
-            localStorage.removeItem('kopral_cart');
-            location.reload();
-        }
+        function bersihkanPesanan() { localStorage.removeItem('active_order_id'); localStorage.removeItem('kopral_cart'); location.reload(); }
 
         function openMenuModal(categoryKey) {
-            const modal = document.getElementById('menu-modal');
-            const title = document.getElementById('modal-category-title');
             const grid = document.getElementById('modal-menu-grid');
-            title.innerText = categoryKey.toUpperCase() + " SERIES";
+            document.getElementById('modal-category-title').innerText = categoryKey.toUpperCase() + " SERIES";
             grid.innerHTML = "";
-            const items = menuDatabase[categoryKey] || [];
-            items.forEach(item => {
-                grid.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                        <div>
-                            <img src="${item.img}" onerror="this.src='${item.fallback}'" class="w-full h-36 object-cover rounded-xl mb-3" alt="${item.name}">
-                            <h4 class="font-bold text-base text-[#1e140a] mb-0.5">${item.name}</h4>
-                            <p class="text-xs text-gray-500 mb-3">${item.desc}</p>
-                        </div>
-                        <div>
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-amber-800 font-extrabold text-sm">Rp ${item.price.toLocaleString('id-ID')}</span>
-                            </div>
-                            <button onclick="addToCart('${item.name}', ${item.price})" class="w-full bg-[#1e140a] text-white py-2 rounded-xl font-bold text-xs hover:bg-amber-800 transition">
-                                + Tambah Pesanan
-                            </button>
-                        </div>
-                    </div>`;
+            (menuDatabase[categoryKey] || []).forEach(item => {
+                grid.innerHTML += `<div class="bg-white p-4 rounded-2xl border flex flex-col justify-between"><img src="${item.img}" onerror="this.src='${item.fallback}'" class="w-full h-36 object-cover rounded-xl mb-3"><h4 class="font-bold text-sm">${item.name}</h4><p class="text-xs text-gray-500 mb-3">${item.desc}</p><p class="text-xs font-bold text-amber-800 mb-2">Rp ${item.price.toLocaleString('id-ID')}</p><button onclick="addToCart('${item.name}', ${item.price})" class="w-full bg-[#1e140a] text-white py-2 rounded-xl text-xs font-bold">+ Tambah</button></div>`;
             });
-            modal.classList.remove('hidden');
+            document.getElementById('menu-modal').classList.remove('hidden');
         }
 
         function closeMenuModal() { document.getElementById('menu-modal').classList.add('hidden'); }
-        function toggleCart() { document.getElementById('cart-sidebar').classList.toggle('translate-x-full'); }
+        function toggleCart() { document.getElementById('cart-modal').classList.toggle('hidden'); }
 
         function addToCart(name, price) {
-            const existingItem = cart.find(item => item.name === name);
-            if (existingItem) existingItem.quantity += 1;
-            else cart.push({ name, price, quantity: 1, note: "" });
+            const existing = cart.find(item => item.name === name);
+            if (existing) existing.quantity += 1; else cart.push({ name, price, quantity: 1, note: "" });
+            updateCartUI();
+        }
+
+        // Fungsi baru untuk mengubah kuantitas
+        function changeQuantity(index, delta) {
+            cart[index].quantity += delta;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
             updateCartUI();
         }
 
         function updateCartUI() {
-            const cartItemsContainer = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-            const cartCount = document.getElementById('cart-count');
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            const countEl = document.getElementById('cart-count');
             saveToStorage();
             
-            if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Keranjang belanja kosong.</p>';
-                cartTotal.innerText = 'Rp 0';
-                cartCount.classList.add('hidden');
-                return;
-            }
-            
-            let total = 0; let totalItems = 0;
-            cartItemsContainer.innerHTML = '';
-            cart.forEach((item, index) => {
-                total += item.price * item.quantity;
-                totalItems += item.quantity;
-                cartItemsContainer.innerHTML += `
-                    <div class="bg-gray-50 p-3 rounded-xl border space-y-2">
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h4 class="font-bold text-sm text-[#1e140a]">${item.name}</h4>
-                                <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}</p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="changeQuantity(${index}, -1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">-</button>
-                                <span class="text-sm font-bold">${item.quantity}</span>
-                                <button onclick="changeQuantity(${index}, 1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">+</button>
-                            </div>
-                        </div>
-                        <input type="text" placeholder="Catatan" value="${item.note || ''}" onchange="updateNote(${index}, this.value)" class="w-full text-[10px] p-2 rounded border border-gray-200 outline-none">
-                    </div>`;
-            });
-            cartTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
-            cartCount.innerText = totalItems;
-            cartCount.classList.remove('hidden');
-        }
-
-        function updateNote(index, value) { cart[index].note = value; saveToStorage(); }
-        function changeQuantity(index, delta) {
-            cart[index].quantity += delta;
-            if (cart[index].quantity <= 0) cart.splice(index, 1);
-            updateCartUI();
-        }
-
-        async function kirimKeKasir() {
-            const namaPelanggan = document.getElementById('cust-name').value.trim();
-            const nomorMeja = document.getElementById('cust-table').value.trim();
-            const metodeBayar = document.getElementById('payment-method').value;
-            const namaPengirim = document.getElementById('sender-name').value.trim();
-            const fileInput = document.getElementById('bukti-file');
-            
-            let buktiBase64 = "";
-
-            if (metodeBayar === 'Transfer') {
-                if (!namaPengirim) {
-                    alert('Mohon isi Nama Pemilik Rekening Pengirim!');
-                    return;
-                }
-                if (!fileInput.files[0]) {
-                    alert('Mohon lampirkan foto bukti transfer!');
-                    return;
-                }
-                buktiBase64 = await getBase64(fileInput.files[0]);
-            }
-
-            if (!namaPelanggan || !nomorMeja || cart.length === 0) { 
-                alert('Harap lengkapi Nama, Meja, dan Pesanan!'); 
+            if (cart.length === 0) { 
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">Keranjang kosong.</p>'; 
+                totalEl.innerText = 'Rp 0'; 
+                countEl.classList.add('hidden'); 
                 return; 
             }
             
+            let total = 0, totalItems = 0; 
+            container.innerHTML = '';
+            
+            cart.forEach((item, index) => {
+                total += item.price * item.quantity; 
+                totalItems += item.quantity;
+                container.innerHTML += `
+                    <div class="bg-gray-50 p-3 rounded-xl">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-sm">${item.name}</h4>
+                            <div class="flex items-center gap-3">
+                                <button onclick="changeQuantity(${index}, -1)" class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center font-bold">-</button>
+                                <span class="font-bold text-sm w-4 text-center">${item.quantity}</span>
+                                <button onclick="changeQuantity(${index}, 1)" class="w-6 h-6 bg-[#e6c694] rounded-full flex items-center justify-center font-bold">+</button>
+                            </div>
+                        </div>
+                        <input type="text" placeholder="Catatan" value="${item.note || ''}" onchange="updateNote(${index}, this.value)" class="w-full text-[10px] p-1.5 rounded border outline-none">
+                    </div>`;
+            });
+            
+            totalEl.innerText = 'Rp ' + total.toLocaleString('id-ID');
+            countEl.innerText = totalItems;
+            countEl.classList.remove('hidden');
+        }
+
+        function updateNote(index, value) { cart[index].note = value; saveToStorage(); }
+
+        async function kirimKeKasir() {
+            const nama = document.getElementById('cust-name').value.trim();
+            const meja = document.getElementById('cust-table').value.trim();
+            const metode = document.getElementById('payment-method').value;
+            const tujuan = document.getElementById('payment-destination').value;
+            const pengirim = document.getElementById('sender-name').value.trim();
+            const fileInput = document.getElementById('bukti-file');
+            
+            let buktiBase64 = "";
+            if (metode === 'Transfer') {
+                if (!tujuan || !pengirim || !fileInput.files[0]) { alert('Lengkapi data pembayaran (Tujuan, Nama Pengirim, dan Bukti)!'); return; }
+                buktiBase64 = await getBase64(fileInput.files[0]);
+            }
+            if (!nama || !meja || cart.length === 0) { alert('Lengkapi Nama, Meja, dan Pesanan!'); return; }
+            
             const orderId = "KPRL-" + Date.now();
-            const payload = { 
-                id_pesanan: orderId, 
-                nama: namaPelanggan, 
-                meja: nomorMeja, 
-                metode: document.getElementById('order-method').value, 
-                pembayaran: metodeBayar,
-                nama_pengirim: namaPengirim,
-                bukti_transfer: buktiBase64,
-                items: cart, 
-                total: cart.reduce((s, i) => s + (i.price * i.quantity), 0), 
-                status_pesanan: "Menunggu", 
-                waktu_pesan: new Date().toISOString() 
-            };
+            const payload = { id_pesanan: orderId, nama, meja, metode: document.getElementById('order-method').value, pembayaran: metode, tujuan_pembayaran: tujuan, nama_pengirim: pengirim, bukti_transfer: buktiBase64, items: cart, total: cart.reduce((s, i) => s + (i.price * i.quantity), 0), status_pesanan: "Menunggu", waktu_pesan: new Date().toISOString() };
 
             try {
-                const response = await fetch(BACKEND_KASIR_API, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(payload) 
-                });
-                if (response.ok) {
-                    localStorage.setItem('active_order_id', orderId);
-                    cart = []; 
-                    localStorage.removeItem('kopral_cart');
-                    renderStatusPesanan(orderId);
-                } else { alert('Gagal mengirim pesanan.'); }
-            } catch (error) { alert('Cek koneksi internet Anda.'); }
+                const response = await fetch(BACKEND_KASIR_API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (response.ok) { localStorage.setItem('active_order_id', orderId); cart = []; localStorage.removeItem('kopral_cart'); renderStatusPesanan(orderId); } else { alert('Gagal mengirim.'); }
+            } catch (error) { alert('Cek koneksi internet.'); }
         }
     </script>
 </body>
