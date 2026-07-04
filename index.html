@@ -4,35 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KOPRAL Coffee - Online Self Ordering System</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         html { scroll-behavior: smooth; }
-        .modal-blur {
-            backdrop-filter: blur(4px);
-            transition: all 0.3s ease-in-out;
-        }
+        .modal-blur { backdrop-filter: blur(4px); transition: all 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-[#faf7f2] text-[#332211] font-sans antialiased">
 
     <nav class="fixed w-full bg-[#1e140a]/95 text-white backdrop-blur-sm z-50 shadow-lg">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            
             <a href="#" class="flex items-center gap-3 group">
                 <img src="assets/brand/logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5064/5064943.png'" alt="Logo KOPRAL Coffee" class="h-10 w-auto object-contain">
                 <span class="text-xl font-bold tracking-wider text-white">KOPRAL<span class="text-[#e6c694]">COFFEE</span></span>
             </a>
-
             <div class="hidden md:flex space-x-8 font-medium">
                 <a href="#home" class="hover:text-[#e6c694] transition">Home</a>
                 <a href="#kategori" class="hover:text-[#e6c694] transition">Pilih Menu</a>
                 <a href="#cara-pesan" class="hover:text-[#e6c694] transition">Cara Pesan</a>
             </div>
-            
             <button onclick="toggleCart()" class="relative bg-[#e6c694] text-[#1e140a] px-5 py-2 rounded-full font-semibold hover:bg-white transition text-sm flex items-center gap-2">
                 <i class="fas fa-shopping-cart"></i>
                 <span>Pesanan Saya</span>
@@ -55,7 +46,6 @@
             <h2 class="text-3xl font-bold text-[#1e140a]">Silakan Pilih Kategori</h2>
             <p class="text-gray-500 mt-2 text-sm">Ketuk salah satu kategori untuk membuka daftar pilihan menu lengkap</p>
         </div>
-        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div onclick="openMenuModal('coffee')" class="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition cursor-pointer group">
                 <div class="h-48 overflow-hidden relative">
@@ -69,7 +59,6 @@
                     <span class="mt-2 inline-block text-amber-800 text-xs font-bold">Buka Menu <i class="fas fa-arrow-right ml-1"></i></span>
                 </div>
             </div>
-
             <div onclick="openMenuModal('non-coffee')" class="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition cursor-pointer group">
                 <div class="h-48 overflow-hidden relative">
                     <img src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?q=80&w=500" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="Non-Coffee">
@@ -82,7 +71,6 @@
                     <span class="mt-2 inline-block text-amber-800 text-xs font-bold">Buka Menu <i class="fas fa-arrow-right ml-1"></i></span>
                 </div>
             </div>
-
             <div onclick="openMenuModal('snacks')" class="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition cursor-pointer group">
                 <div class="h-48 overflow-hidden relative">
                     <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?q=80&w=500" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="Snacks">
@@ -144,17 +132,14 @@
             <h3 class="text-xl font-bold"><i class="fas fa-mug-hot mr-2"></i>Daftar Pesanan</h3>
             <button onclick="toggleCart()" class="text-2xl hover:text-[#e6c694]">×</button>
         </div>
-        
         <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-4">
             <p class="text-gray-500 text-center py-8">Keranjang belanja kosong.</p>
         </div>
-
-        <div class="p-6 border-t border-gray-100 bg-gray-50">
+        <div id="cart-footer" class="p-6 border-t border-gray-100 bg-gray-50">
             <div class="flex justify-between font-bold text-lg mb-4 text-[#1e140a]">
                 <span>Total Biaya:</span>
                 <span id="cart-total">Rp 0</span>
             </div>
-            
             <div class="space-y-3 mb-4">
                 <input type="text" id="cust-name" placeholder="Nama Pelanggan" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
                 <input type="number" id="cust-table" placeholder="Nomor Meja Anda" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
@@ -162,8 +147,19 @@
                     <option value="Dine-In">Makan di tempat (Dine-In)</option>
                     <option value="Take-Away">Bawa Pulang (Take-Away)</option>
                 </select>
+                <select id="payment-method" onchange="toggleBuktiField()" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
+                    <option value="Cash">Tunai (Cash)</option>
+                    <option value="Transfer">Transfer / QRIS</option>
+                    <option value="Testing-Mode">Uji Coba (Test Mode)</option>
+                </select>
+                
+                <!-- Input Bukti Transfer Baru -->
+                <div id="bukti-container" class="hidden space-y-3 pt-2 border-t mt-2">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Detail Pembayaran</label>
+                    <input type="text" id="sender-name" placeholder="Nama Pemilik Rekening Pengirim" class="w-full px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-700">
+                    <input type="file" id="bukti-file" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                </div>
             </div>
-
             <button onclick="kirimKeKasir()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2">
                 <i class="fas fa-paper-plane"></i> Kirim Pesanan ke Kasir
             </button>
@@ -176,7 +172,6 @@
 
     <script>
         const BACKEND_KASIR_API = "https://kopral-coffee-central.onrender.com/api/pesanan-masuk";
-
         const menuDatabase = {
             "coffee": [
                 { name: "Espresso Roman", price: 22000, desc: "Ekstrak kopi pekat murni.", img: "", fallback: "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=500" },
@@ -193,18 +188,66 @@
             ]
         };
 
-        let cart = [];
+        let cart = JSON.parse(localStorage.getItem('kopral_cart')) || [];
+        
+        window.onload = function() {
+            updateCartUI();
+            const savedOrderId = localStorage.getItem('active_order_id');
+            if (savedOrderId) {
+                renderStatusPesanan(savedOrderId);
+            }
+        };
+
+        function toggleBuktiField() {
+            const method = document.getElementById('payment-method').value;
+            const container = document.getElementById('bukti-container');
+            container.classList.toggle('hidden', method !== 'Transfer');
+        }
+
+        async function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('kopral_cart', JSON.stringify(cart));
+            localStorage.setItem('kopral_name', document.getElementById('cust-name').value);
+            localStorage.setItem('kopral_table', document.getElementById('cust-table').value);
+        }
+
+        function renderStatusPesanan(orderId) {
+            const container = document.getElementById('cart-items');
+            const footer = document.getElementById('cart-footer');
+            
+            container.innerHTML = `
+                <div class="text-center py-10 space-y-4">
+                    <div class="text-emerald-600 text-5xl"><i class="fas fa-check-circle"></i></div>
+                    <h3 class="font-bold text-lg">Pesanan Aktif!</h3>
+                    <p class="text-sm text-gray-600">ID: ${orderId}</p>
+                    <p class="text-xs bg-amber-100 p-3 rounded-lg text-amber-900">Pesanan Anda sedang diproses oleh kasir. Mohon tetap di meja Anda.</p>
+                    <button onclick="bersihkanPesanan()" class="text-xs underline text-gray-500">Pesan Menu Lain</button>
+                </div>
+            `;
+            footer.classList.add('hidden');
+        }
+
+        function bersihkanPesanan() {
+            localStorage.removeItem('active_order_id');
+            localStorage.removeItem('kopral_cart');
+            location.reload();
+        }
 
         function openMenuModal(categoryKey) {
             const modal = document.getElementById('menu-modal');
             const title = document.getElementById('modal-category-title');
             const grid = document.getElementById('modal-menu-grid');
-            
             title.innerText = categoryKey.toUpperCase() + " SERIES";
             grid.innerHTML = "";
-            
             const items = menuDatabase[categoryKey] || [];
-            
             items.forEach(item => {
                 grid.innerHTML += `
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
@@ -221,8 +264,7 @@
                                 + Tambah Pesanan
                             </button>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
             modal.classList.remove('hidden');
         }
@@ -232,11 +274,8 @@
 
         function addToCart(name, price) {
             const existingItem = cart.find(item => item.name === name);
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                cart.push({ name, price, quantity: 1, note: "" });
-            }
+            if (existingItem) existingItem.quantity += 1;
+            else cart.push({ name, price, quantity: 1, note: "" });
             updateCartUI();
         }
 
@@ -244,6 +283,7 @@
             const cartItemsContainer = document.getElementById('cart-items');
             const cartTotal = document.getElementById('cart-total');
             const cartCount = document.getElementById('cart-count');
+            saveToStorage();
             
             if (cart.length === 0) {
                 cartItemsContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Keranjang belanja kosong.</p>';
@@ -251,11 +291,9 @@
                 cartCount.classList.add('hidden');
                 return;
             }
-
-            let total = 0;
-            let totalItems = 0;
+            
+            let total = 0; let totalItems = 0;
             cartItemsContainer.innerHTML = '';
-
             cart.forEach((item, index) => {
                 total += item.price * item.quantity;
                 totalItems += item.quantity;
@@ -267,27 +305,20 @@
                                 <p class="text-xs text-gray-500">Rp ${item.price.toLocaleString('id-ID')} x ${item.quantity}</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="changeQuantity(${index}, -1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold hover:bg-gray-300">-</button>
+                                <button onclick="changeQuantity(${index}, -1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">-</button>
                                 <span class="text-sm font-bold">${item.quantity}</span>
-                                <button onclick="changeQuantity(${index}, 1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold hover:bg-gray-300">+</button>
+                                <button onclick="changeQuantity(${index}, 1)" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">+</button>
                             </div>
                         </div>
-                        <input type="text" placeholder="Catatan (misal: kurang gula)" 
-                               value="${item.note || ''}" 
-                               onchange="updateNote(${index}, this.value)"
-                               class="w-full text-[10px] p-2 rounded border border-gray-200 focus:ring-1 focus:ring-amber-700 outline-none">
+                        <input type="text" placeholder="Catatan" value="${item.note || ''}" onchange="updateNote(${index}, this.value)" class="w-full text-[10px] p-2 rounded border border-gray-200 outline-none">
                     </div>`;
             });
-
             cartTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
             cartCount.innerText = totalItems;
             cartCount.classList.remove('hidden');
         }
 
-        function updateNote(index, value) {
-            cart[index].note = value;
-        }
-
+        function updateNote(index, value) { cart[index].note = value; saveToStorage(); }
         function changeQuantity(index, delta) {
             cart[index].quantity += delta;
             if (cart[index].quantity <= 0) cart.splice(index, 1);
@@ -297,47 +328,57 @@
         async function kirimKeKasir() {
             const namaPelanggan = document.getElementById('cust-name').value.trim();
             const nomorMeja = document.getElementById('cust-table').value.trim();
-            const metodePesan = document.getElementById('order-method').value;
+            const metodeBayar = document.getElementById('payment-method').value;
+            const namaPengirim = document.getElementById('sender-name').value.trim();
+            const fileInput = document.getElementById('bukti-file');
+            
+            let buktiBase64 = "";
 
-            if (!namaPelanggan) { alert('Harap masukkan Nama Anda!'); return; }
-            if (!nomorMeja) { alert('Harap masukkan Nomor Meja Anda!'); return; }
-            if (cart.length === 0) { alert('Daftar pesanan Anda masih kosong!'); return; }
+            if (metodeBayar === 'Transfer') {
+                if (!namaPengirim) {
+                    alert('Mohon isi Nama Pemilik Rekening Pengirim!');
+                    return;
+                }
+                if (!fileInput.files[0]) {
+                    alert('Mohon lampirkan foto bukti transfer!');
+                    return;
+                }
+                buktiBase64 = await getBase64(fileInput.files[0]);
+            }
 
-            const totalHarga = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            const payloadPesanan = {
-                id_pesanan: "KPRL-" + Date.now(),
-                nama: namaPelanggan,
-                meja: nomorMeja,
-                metode: metodePesan,
-                items: cart,
-                total: totalHarga,
-                status_pesanan: "Menunggu Konfirmasi",
-                waktu_pesan: new Date().toISOString()
+            if (!namaPelanggan || !nomorMeja || cart.length === 0) { 
+                alert('Harap lengkapi Nama, Meja, dan Pesanan!'); 
+                return; 
+            }
+            
+            const orderId = "KPRL-" + Date.now();
+            const payload = { 
+                id_pesanan: orderId, 
+                nama: namaPelanggan, 
+                meja: nomorMeja, 
+                metode: document.getElementById('order-method').value, 
+                pembayaran: metodeBayar,
+                nama_pengirim: namaPengirim,
+                bukti_transfer: buktiBase64,
+                items: cart, 
+                total: cart.reduce((s, i) => s + (i.price * i.quantity), 0), 
+                status_pesanan: "Menunggu", 
+                waktu_pesan: new Date().toISOString() 
             };
 
             try {
-                const response = await fetch(BACKEND_KASIR_API, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payloadPesanan)
+                const response = await fetch(BACKEND_KASIR_API, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload) 
                 });
-
                 if (response.ok) {
-                    alert(`Pesanan Berhasil Dikirim!\nMohon tunggu di Meja ${nomorMeja}, Barista sedang memproses pesanan Anda.`);
-                    cart = [];
-                    document.getElementById('cust-name').value = '';
-                    document.getElementById('cust-table').value = '';
-                    updateCartUI();
-                    toggleCart();
-                    closeMenuModal();
-                } else {
-                    alert('Gagal mengirim pesanan. Server cloud menolak permintaan.');
-                }
-            } catch (error) {
-                console.error("Error sending order:", error);
-                alert('Gagal terhubung ke Server Cloud Kasir. Pastikan perangkat Anda terhubung ke internet.');
-            }
+                    localStorage.setItem('active_order_id', orderId);
+                    cart = []; 
+                    localStorage.removeItem('kopral_cart');
+                    renderStatusPesanan(orderId);
+                } else { alert('Gagal mengirim pesanan.'); }
+            } catch (error) { alert('Cek koneksi internet Anda.'); }
         }
     </script>
 </body>
