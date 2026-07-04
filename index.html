@@ -310,7 +310,10 @@
                 container.innerHTML += `
                     <div class="bg-gray-50 p-3 rounded-xl">
                         <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-sm">${item.name}</h4>
+                            <div>
+                                <h4 class="font-bold text-sm">${item.name}</h4>
+                                <p class="text-[10px] text-gray-500">@ Rp ${item.price.toLocaleString('id-ID')}</p>
+                            </div>
                             <div class="flex items-center gap-3">
                                 <button onclick="changeQuantity(${index}, -1)" class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center font-bold">-</button>
                                 <span class="font-bold text-sm w-4 text-center">${item.quantity}</span>
