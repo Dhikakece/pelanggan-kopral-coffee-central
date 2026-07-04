@@ -172,9 +172,6 @@
                         <option value="QRIS">QRIS: Tekan Tampilkan Barcode</option>
                     </select>
                 </div>
-                <button id="btn-show-qris" onclick="toggleQrisModal()" class="w-full bg-[#2563eb] text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition hidden flex items-center justify-center gap-2">
-                    <i class="fas fa-qrcode"></i> Tampilkan Barcode QRIS
-                </button>
                 
                 <!-- Container Bukti Baru (Cloudinary) -->
                 <div id="bukti-container" class="hidden space-y-3 pt-2">
@@ -188,6 +185,11 @@
 
                 <button id="btn-kirim" onclick="kirimKeKasir()" class="w-full bg-[#059669] text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition">
                     Kirim ke Kasir
+                </button>
+
+                <!-- Tombol QRIS di bawah tombol Kirim -->
+                <button id="btn-show-qris" onclick="toggleQrisModal()" class="w-full bg-[#2563eb] text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition hidden flex items-center justify-center gap-2">
+                    <i class="fas fa-qrcode"></i> Tampilkan Barcode QRIS
                 </button>
             </div>
         </div>
@@ -205,8 +207,8 @@
         // KONFIGURASI CLOUDINARY WIDGET
         function bukaWidgetUpload() {
             var myWidget = cloudinary.createUploadWidget({
-                cloudName: 'wiosnp5g', // GANTI INI
-                uploadPreset: 'kopral_preset', // GANTI INI
+                cloudName: 'wiosnp5g', 
+                uploadPreset: 'kopral_preset', 
                 sources: ['local', 'camera'],
                 multiple: false
             }, (error, result) => { 
