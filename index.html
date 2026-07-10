@@ -434,8 +434,20 @@
     </footer>
 
     <script>
-      const BACKEND_KASIR_API =
-        "https://kopral-coffee-central.onrender.com/api/pesanan-masuk";
+      const CLOUD_BACKEND = "https://kopral-coffee-central.onrender.com";
+      const useLocalBackend =
+        new URLSearchParams(window.location.search).get("local") === "1" ||
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+      const BACKEND_KASIR_API = useLocalBackend
+        ? "http://localhost:3000/api/pesanan-masuk"
+        : `${CLOUD_BACKEND}/api/pesanan-masuk`;
+      const MENU_API_URL = useLocalBackend
+        ? "http://localhost:3000"
+        : CLOUD_BACKEND;
+      const SOCKET_BASE = useLocalBackend
+        ? "http://localhost:3000"
+        : CLOUD_BACKEND;
       let cart = JSON.parse(localStorage.getItem("kopral_cart")) || [];
       let buktiUrlCloudinary = "";
       let socket = null;
@@ -464,8 +476,6 @@
         myWidget.open();
       }
 
-      const MENU_API_URL = "https://kopral-coffee-central.onrender.com";
-
       function mergeMenuStockData(data) {
         const categories = Object.keys(menuDatabase);
         categories.forEach((category) => {
@@ -478,7 +488,13 @@
                 (entry.id && entry.id === item.id) || entry.name === item.name,
             );
             if (incomingItem) {
-              item.stock = Number(incomingItem.stock ?? item.stock);
+              // keep stock as number when provided; otherwise leave existing value
+              if (
+                incomingItem.stock !== undefined &&
+                incomingItem.stock !== null
+              ) {
+                item.stock = Number(incomingItem.stock);
+              }
               if (incomingItem.id) item.id = incomingItem.id;
             }
           });
@@ -498,6 +514,13 @@
             }
           });
         });
+        // update cached menu so customers keep correct view on refresh
+        try {
+          localStorage.setItem(
+            "kopral_menu_cache",
+            JSON.stringify(menuDatabase),
+          );
+        } catch (e) {}
         refreshMenuView();
       }
 
@@ -510,17 +533,50 @@
       async function syncMenuData() {
         try {
           const response = await fetch(MENU_API_URL + "?action=getMenu");
+          if (!response.ok) throw new Error("Network response not ok");
           const data = await response.json();
           mergeMenuStockData(data);
+          // cache menu for offline/fallback use
+          try {
+            localStorage.setItem(
+              "kopral_menu_cache",
+              JSON.stringify(menuDatabase),
+            );
+          } catch (e) {}
           refreshMenuView();
           console.log("Stok berhasil disinkronkan");
+          return true;
         } catch (e) {
-          console.warn("Gagal sinkronisasi, menggunakan menu default.");
+          console.warn("Gagal sinkronisasi, mencoba cache lokal jika ada.");
+          try {
+            const cache = localStorage.getItem("kopral_menu_cache");
+            if (cache) {
+              const cached = JSON.parse(cache);
+              // merge cached stocks into current menu database
+              mergeMenuStockData(cached);
+              refreshMenuView();
+              console.log("Menggunakan cache menu lokal.");
+              return false;
+            }
+          } catch (err) {
+            console.warn("Tidak ada cache lokal atau cache rusak.");
+          }
+          // As last resort, do not overwrite menuStock values (keep defaults but mark as unknown)
+          // set undefined stock to null so UI treats them as available (unknown)
+          Object.values(menuDatabase).forEach((items) => {
+            items.forEach((item) => {
+              if (item.stock === undefined || item.stock === null) return;
+              // if stock seems default 0 and we couldn't sync and no cache, set to null (unknown)
+              if (item.stock === 0) item.stock = null;
+            });
+          });
+          refreshMenuView();
+          return false;
         }
       }
 
       window.onload = async () => {
-        socket = io("https://kopral-coffee-central.onrender.com", {
+        socket = io(SOCKET_BASE, {
           reconnection: true,
           reconnectionAttempts: Infinity,
           reconnectionDelay: 1000,
@@ -593,7 +649,8 @@
         grid.innerHTML = "";
         (menuDatabase[categoryKey] || []).forEach((item) => {
           // --- TAMBAHKAN LOGIKA INI DI SINI ---
-          const isDisabled = item.stock <= 0;
+          const isDisabled =
+            typeof item.stock === "number" ? item.stock <= 0 : false;
           const buttonClass = isDisabled
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-[#1e140a]";
@@ -607,11 +664,11 @@
                 <div class="flex justify-between items-center mb-2">
                     <p class="text-xs font-bold text-amber-800">Rp ${item.price.toLocaleString("id-ID")}</p>
                     <span class="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-lg font-semibold">
-                        ${isDisabled ? "❌ Habis" : `📦 ${item.stock} pcs`}
+                      ${isDisabled ? "❌ Habis" : typeof item.stock === "number" ? `📦 ${item.stock} pcs` : `📦 -`}
                     </span>
                 </div>
                 <button
-                    onclick="${isDisabled ? "" : `addToCart('${item.name}', ${item.price})`}"
+                    onclick="${isDisabled ? "" : `addToCart('${item.id}', ${JSON.stringify(item.name)}, ${item.price})`}"
                     class="w-full ${buttonClass} text-white py-2 rounded-xl text-xs font-bold"
                     ${isDisabled ? "disabled" : ""}>
                     ${buttonText}
@@ -631,6 +688,7 @@
       const menuDatabase = {
         coffee: [
           {
+            id: "c01",
             name: "Espresso Roman",
             price: 22000,
             stock: 0,
@@ -640,6 +698,7 @@
               "https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=500",
           },
           {
+            id: "c02",
             name: "Creamy Latte",
             price: 28000,
             stock: 0,
@@ -826,10 +885,29 @@
         ],
       };
 
-      function addToCart(name, price) {
-        const existing = cart.find((item) => item.name === name);
+      function normalizeMenuIds() {
+        Object.keys(menuDatabase).forEach((category) => {
+          menuDatabase[category].forEach((item, index) => {
+            if (!item.id) {
+              const slug = item.name
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, "-")
+                .replace(/(^-|-$)/g, "");
+              item.id = `${category.charAt(0)}${String(index + 1).padStart(
+                2,
+                "0",
+              )}-${slug}`;
+            }
+          });
+        });
+      }
+
+      normalizeMenuIds();
+
+      function addToCart(id, name, price) {
+        const existing = cart.find((item) => item.id === id);
         if (existing) existing.quantity += 1;
-        else cart.push({ name, price, quantity: 1, note: "" });
+        else cart.push({ id, name, price, quantity: 1, note: "" });
         updateCartUI();
       }
 
@@ -904,7 +982,13 @@
           tujuan_pembayaran: tujuan,
           nama_pengirim: pengirim,
           bukti_transfer: buktiUrlCloudinary,
-          items: cart,
+          items: cart.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            note: item.note || "",
+          })),
           total: cart.reduce((s, i) => s + i.price * i.quantity, 0),
           status_pesanan: "Menunggu",
           waktu_pesan: new Date().toISOString(),
