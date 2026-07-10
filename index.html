@@ -655,6 +655,17 @@
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-[#1e140a]";
           const buttonText = isDisabled ? "Habis" : "+ Tambah";
+          const safeId = String(item.id || "").replace(/'/g, "\\'");
+          const safeName = String(item.name || "").replace(/'/g, "\\'");
+          const onclickValue = isDisabled
+            ? ""
+            : "addToCart('" +
+              safeId +
+              "', '" +
+              safeName +
+              "', " +
+              item.price +
+              ")";
           // ------------------------------------
           grid.innerHTML += `
             <div class="bg-white p-4 rounded-2xl border flex flex-col justify-between">
@@ -668,7 +679,7 @@
                     </span>
                 </div>
                 <button
-                    onclick="${isDisabled ? "" : `addToCart('${item.id}', ${JSON.stringify(item.name)}, ${item.price})`}"
+                    onclick="${onclickValue}"
                     class="w-full ${buttonClass} text-white py-2 rounded-xl text-xs font-bold"
                     ${isDisabled ? "disabled" : ""}>
                     ${buttonText}
