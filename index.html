@@ -904,6 +904,18 @@
 
       normalizeMenuIds();
 
+      function normalizeMenuStockDefaults() {
+        Object.values(menuDatabase).forEach((items) => {
+          items.forEach((item) => {
+            if (item.stock === 0) {
+              item.stock = null;
+            }
+          });
+        });
+      }
+
+      normalizeMenuStockDefaults();
+
       function addToCart(id, name, price) {
         const existing = cart.find((item) => item.id === id);
         if (existing) existing.quantity += 1;
