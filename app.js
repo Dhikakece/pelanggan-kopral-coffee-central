@@ -1,8 +1,9 @@
 const CLOUD_BACKEND = "https://kopral-coffee-central.onrender.com";
 // Determine base URL: prefer current origin when the site is served from the kasir server
-// (served under /pelanggan) or when running on localhost.
+// or when running on localhost.
+const isGitHubPages = window.location.hostname.includes("github.io");
 const servedFromKasir =
-  window.location.pathname.startsWith("/pelanggan") ||
+  (window.location.pathname.startsWith("/pelanggan") && !isGitHubPages) ||
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1" ||
   new URLSearchParams(window.location.search).get("local") === "1";
@@ -717,7 +718,8 @@ function normalizeMenuIds() {
 function normalizeMenuStockDefaults() {
   Object.values(menuDatabase).forEach((items) => {
     items.forEach((item) => {
-      if (item.stock === 0) {
+      // Don't turn 0 into null, keep it as 0 for "Habis" logic
+      if (item.stock === undefined || item.stock === null) {
         item.stock = null;
       }
     });
