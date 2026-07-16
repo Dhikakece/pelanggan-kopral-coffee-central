@@ -2,15 +2,24 @@ const CLOUD_BACKEND = "https://kopral-coffee-central.onrender.com";
 // Determine base URL: prefer current origin when the site is served from the kasir server
 // or when running on localhost.
 const isGitHubPages = window.location.hostname.includes("github.io");
-const servedFromKasir =
-  (window.location.pathname.startsWith("/pelanggan") && !isGitHubPages) ||
+const isLocalhost =
   window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1" ||
-  new URLSearchParams(window.location.search).get("local") === "1";
-const BASE_BACKEND = servedFromKasir ? window.location.origin : CLOUD_BACKEND;
-const BACKEND_KASIR_API = `${BASE_BACKEND}/api/pesanan-masuk`;
-const MENU_API_URL = BASE_BACKEND;
-const SOCKET_BASE = BASE_BACKEND;
+  window.location.hostname === "127.0.0.1";
+const isServedFromKasir =
+  window.location.pathname === "/pelanggan" ||
+  window.location.pathname.startsWith("/pelanggan/");
+const isLikelyServedByKasir =
+  isServedFromKasir ||
+  window.location.pathname.includes("/pelanggan") ||
+  isLocalhost;
+
+const BASE_BACKEND =
+  (isLikelyServedByKasir || isLocalhost) && !isGitHubPages
+    ? window.location.origin
+    : CLOUD_BACKEND;
+const BACKEND_KASIR_API = `${BASE_BACKEND.replace(/\/$/, "")}/api/pesanan-masuk`;
+const MENU_API_URL = BASE_BACKEND.replace(/\/$/, "");
+const SOCKET_BASE = BASE_BACKEND.replace(/\/$/, "");
 
 let cart = JSON.parse(localStorage.getItem("kopral_cart")) || [];
 let buktiUrlCloudinary = "";
@@ -258,41 +267,76 @@ function saveToStorage() {
   localStorage.setItem("kopral_cart", JSON.stringify(cart));
 }
 
+function persistActiveOrderState(orderId, queueNumber = "") {
+  try {
+    localStorage.setItem(
+      "kopral_active_order_state",
+      JSON.stringify({
+        orderId: orderId || "",
+        queueNumber: queueNumber || "",
+        createdAt: Date.now(),
+      }),
+    );
+  } catch (e) {
+    console.warn("Gagal menyimpan state pesanan aktif:", e);
+  }
+}
+
+function clearActiveOrderState() {
+  try {
+    localStorage.removeItem("kopral_active_order_state");
+  } catch (e) {}
+}
+
 function renderStatusPesanan(orderId) {
   const container = document.getElementById("cart-items");
+  const detailPanel = document.querySelector(".cart-detail-panel");
   const footer = document.getElementById("cart-footer");
-  if (!container || !footer) return;
-  container.innerHTML = `<div class="text-center py-10"><div class="text-emerald-600 text-5xl mb-4"><i class="fas fa-check-circle"></i></div><h3 class="font-bold text-lg">Pesanan Aktif!</h3><p class="text-sm text-gray-600 mb-2">ID: ${orderId}</p><button onclick="bersihkanPesanan()" class="text-xs underline text-gray-500">Pesan Lagi</button></div>`;
-  footer.classList.add("hidden");
-}
+  const cartModal = document.getElementById("cart-modal");
+  const countEl = document.getElementById("cart-count");
+  const orderIdResolved = orderId || "Pesanan Anda";
 
-let queuePopupTimeout = null;
-function showQueuePopup(queueNumber, orderId) {
-  const popup = document.getElementById("queue-popup");
-  const numberEl = document.getElementById("queue-number");
-  const infoEl = document.getElementById("queue-info");
-  if (!popup || !numberEl || !infoEl) return;
+  if (!container) return;
 
-  numberEl.textContent = queueNumber;
-  infoEl.textContent = `Pesanan ${orderId} sudah dikirim. Tunjukkan nomor antrean ini ke barista.`;
-  popup.classList.add("show");
+  persistActiveOrderState(orderIdResolved, "");
 
-  clearTimeout(queuePopupTimeout);
-  queuePopupTimeout = setTimeout(() => {
-    popup.classList.remove("show");
-  }, 7000);
-}
+  container.innerHTML = `
+    <div class="text-center py-10 space-y-4">
+      <div class="text-emerald-500 text-5xl mb-2"><i class="fas fa-check-circle"></i></div>
+      <h3 class="font-bold text-lg text-white">Pesanan Aktif!</h3>
+      <p class="text-sm text-slate-400">ID Pesanan: <span class="font-semibold text-amber-300">${orderIdResolved}</span></p>
+      <p class="text-xs text-slate-500">Pesanan Anda sudah diteruskan ke kasir. Silakan tunggu konfirmasi.</p>
+      <button onclick="bersihkanPesanan()" class="mt-2 inline-flex items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:text-white hover:border-amber-500 transition">Pesan Lagi</button>
+    </div>
+  `;
 
-function hideQueuePopup() {
-  const popup = document.getElementById("queue-popup");
-  if (!popup) return;
-  popup.classList.remove("show");
-  clearTimeout(queuePopupTimeout);
+  if (detailPanel) {
+    detailPanel.innerHTML = `
+      <div class="flex h-full flex-col items-center justify-center rounded-[2rem] border border-emerald-500/20 bg-emerald-500/10 p-6 text-center">
+        <div class="mb-3 text-5xl text-emerald-400"><i class="fas fa-utensils"></i></div>
+        <h4 class="text-lg font-bold text-white">Pesanan Anda Terkirim</h4>
+        <p class="mt-2 text-sm text-slate-300">Status pesanan Anda sudah tersimpan dan akan tetap muncul walau halaman refresh.</p>
+        <button onclick="bersihkanPesanan()" class="mt-4 rounded-full bg-amber-400 px-4 py-2 text-sm font-bold text-slate-950">Mulai Pesanan Baru</button>
+      </div>
+    `;
+  }
+
+  if (footer) {
+    footer.classList.add("hidden");
+  }
+  if (countEl) {
+    countEl.innerText = "0";
+    countEl.classList.add("hidden");
+  }
+  if (cartModal) {
+    cartModal.classList.remove("hidden");
+  }
 }
 
 function bersihkanPesanan() {
   localStorage.removeItem("active_order_id");
   localStorage.removeItem("kopral_cart");
+  clearActiveOrderState();
   location.reload();
 }
 
@@ -471,10 +515,7 @@ async function kirimKeKasir() {
       body: JSON.stringify(payload),
     });
     if (response.ok) {
-      const responseData = await response.json().catch(() => ({}));
-      const queueNumber =
-        responseData?.queue_number ||
-        `#${String(Math.floor(100 + (Date.now() % 900))).padStart(3, "0")}`;
+      await response.json().catch(() => ({}));
 
       localStorage.setItem("active_order_id", payload.id_pesanan);
       cart = [];
@@ -485,7 +526,6 @@ async function kirimKeKasir() {
       }
 
       renderStatusPesanan(payload.id_pesanan);
-      showQueuePopup(queueNumber, payload.id_pesanan);
     } else {
       throw new Error("Response not ok");
     }
@@ -748,10 +788,16 @@ window.onload = async () => {
   });
 
   await syncMenuData();
-  updateCartUI();
+  const savedState = JSON.parse(
+    localStorage.getItem("kopral_active_order_state") || "null",
+  );
+  const id = localStorage.getItem("active_order_id") || savedState?.orderId;
+  if (id) {
+    renderStatusPesanan(id);
+  } else {
+    updateCartUI();
+  }
   toggleBuktiField();
-  const id = localStorage.getItem("active_order_id");
-  if (id) renderStatusPesanan(id);
 };
 
 function toggleBuktiField() {
