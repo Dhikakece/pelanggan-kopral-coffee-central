@@ -799,60 +799,6 @@ body.mobile-menu-open {
   padding-right: 1rem;
 }
 
-.queue-popup {
-  position: fixed;
-  left: 50%;
-  bottom: 1rem;
-  z-index: 95;
-  transform: translateX(-50%) translateY(120%);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    transform 0.3s ease,
-    opacity 0.3s ease,
-    visibility 0.3s ease;
-}
-.queue-popup.show {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-  visibility: visible;
-}
-.queue-popup-card {
-  width: min(92vw, 420px);
-  background: rgba(8, 13, 23, 0.98);
-  border: 1px solid rgba(250, 204, 21, 0.22);
-  border-radius: 1.75rem;
-  padding: 1rem 1.2rem;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
-}
-.queue-popup-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
-}
-.queue-popup-close {
-  width: 2.5rem;
-  height: 2.5rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.12);
-  color: #f8fafc;
-  font-size: 1.25rem;
-  border: none;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    background-color 0.2s ease;
-}
-.queue-popup-close:hover {
-  background: rgba(250, 204, 21, 0.18);
-  transform: scale(1.05);
-}
-
 .grid.grid-cols-1.md\:grid-cols-3,
 .grid.grid-cols-1.sm\:grid-cols-2 {
   gap: 1.2rem;
